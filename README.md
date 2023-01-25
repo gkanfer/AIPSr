@@ -1,15 +1,17 @@
 ﻿# <p>  <b>AI-photoswitchable screening (AI-PS) </b> </p>
 <img src="https://github.com/gkanfer/AI-PS/raw/master/logoAIPS.png" width="250" title="cellpose" alt="cellpose" align="right" vspace = "10">
 
-This project permits the development and utilization of a pooled optical screen by making use of photoactivation and sorting. AI-PS algorithms provide a structure for segmenting cells, training machine learning algorithms to categorize cellular phenotypes, and applying these for executing a screen on the fly. To learn more, take a look at Kanfer et al., 2021.
+This project permits the development and utilization of a pooled optical screen by making use of photoactivation and sorting. AI-PS algorithms provide a structure for segmenting cells, training machine learning algorithms to categorize cellular phenotypes, and applying these for executing a screen on the fly. To learn more, take a look at [Kanfer et al., 2021](https://rupress.org/jcb/article/220/2/e202006180/211694/Image-based-pooled-whole-genome-CRISPRi-screening).
+
+A working example can be found under the example directory ([link](https://github.com/gkanfer/AIPSr/tree/main/Examples)). 
 
 ### About photoswitchable Crispr screening 
   
-AI-PS is a platform that uses machine learning and deep learning algorithms to facilitate pooled genetic screening for subcellular image phenotypes. This method reduces time, cost and complexity compared to standard screening methods. AI-PS can detect and label cells according to subcellular protein localization, abundance, size and shape. It is compatible with adherent tissue culture cells and is accessible with no need for specialized flow instrumentation. Results of this platform have been validated by identifying PINK1 as the only known reported hit required for Parkin translocation to damaged mitochondria. It has also been used to explore a completely different protein translocation process undetectable via FACS.
+AI-PS is a platform that uses machine learning and deep learning algorithms to facilitate pooled genetic screening for subcellular image phenotypes. This method reduces time, cost and complexity compared to standard screening methods. AI-PS can detect and label cells according to subcellular protein localization, abundance, size and shape. It is compatible with adherent tissue culture cells and is accessible with no need for specialized flow instrumentation. Results of this platform have been validated by identifying PINK1 as the only known reported hit required for Parkin translocation to damaged mitochondria. It has also been used to explore a completely different protein translocation process undetectable via [FACS](https://github.com/gkanfer/AI-PS/tree/master/facs).
 
 
 ### CITATION
-Kanfer, G., Sarraf,S., Mamman, K., Baldwin, H., Johnson, K., Kampmann, M., Ward, M., Lippincott-Schwartz, J., Youle, R. Image-based pooled whole genome CRISPR screening for intracellular phenotypes – Parkin and TFEB subcellular localization. J Cell Biol. 2021 Feb 1;220(2):e202006180. doi: 10.1083/jcb.202006180
+Kanfer, G., Sarraf,S., Mamman, K., Baldwin, H., Johnson, K., Kampmann, M., Ward, M., Lippincott-Schwartz, J., Youle, R. Image-based pooled whole genome CRISPR screening for intracellular phenotypes – Parkin and TFEB subcellular localization. J Cell Biol. 2021 Feb 1;220(2):e202006180. doi: [10.1083/jcb.202006180](https://github.com/gkanfer/AIPSr/tree/main/Examples)
 
 ### Installation
 ```
