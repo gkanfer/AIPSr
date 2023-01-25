@@ -1,0 +1,9 @@
+Package: AIPSr
+Title: AI-photoswitchable screening (AI-PS)
+Version: 0.0.0.9000
+Authors: Gil Kanfer and Heather Buldwin
+Description: This project permits the development and utilization of a pooled optical screen by making use of photoactivation and sorting. AI-PS algorithms provide a structure for segmenting cells, training machine learning algorithms to categorize cellular phenotypes, and applying these for executing a screen on the fly. To learn more, take a look at Kanfer et al., 2021.
+License: `use_mit_license()`
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
