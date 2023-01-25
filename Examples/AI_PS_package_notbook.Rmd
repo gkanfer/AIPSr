@@ -1,0 +1,138 @@
+---
+title: "AI-PS package notebook"
+output: html_notebook
+---
+setting working directory
+```{r}
+knitr::opts_knit$set(root.dir = normalizePath("/Users/kanferg/Desktop/Gil_LabWork/Gil_packages/AIPS_Package/Example_images/sgPINKvsWT/"))
+```
+
+
+Parkin expressing cells treated with CCCP are loaded
+```{r}
+frame<-load_image(Image_File_name="Image_1.tif",path="/Users/kanferg/Desktop/Gil_LabWork/Gil_packages/AIPS_Package/Example_images/sgPINKvsWT/",minmax_nrom=TRUE)
+```
+
+The variable object is a list of two channel
+Parkin-GFP in channel-1 and dapi staining for channel-2
+
+```{r}
+display(abind(frame$CH1*5,frame$CH2,along = 1),method = "raster")
+```
+```{r, figures-side, fig.show="hold", out.width="25%"}
+#par(mar = c(4, 4, .1, .1))
+plot(frame$CH1*5)
+plot(frame$CH2)
+```
+
+
+
+First the nucleus will be segmented using the Nucleus_segmentation function. 
+
+```{r}
+nuc_mask<-Nucleus_segmentation(x=frame$CH2,intens=1,filter_size=10,offset=0.04,opensize=3,
+                               rmObjects_small=30,Use_watershed=TRUE,distmap_value=2,rm_outliers=TRUE,Out_P=0.95,
+                               Masks_display=TRUE)
+seg_disp = paintObjects(nuc_mask$mask_nuc, toRGB(frame$CH2), opac=c(1, 1),col=c("red",NA),thick=TRUE,closed=TRUE)
+plot(seg_disp)
+```
+
+
+
+Than the GFP-Parkin will be segmented using the nuc_mask as the seed. The function retrieved a list composed of roi pixel coordination of the center of ecth cell and a table and two maks one for the cytosle and the other for the nuclues.  
+
+```{r}
+GFP_mask<-Cytosol_segmentation(x=frame$CH1,y=nuc_mask$mask_nuc,intens=5,filter_size=10,offset=0.1,mat_size_smooth=19,opensize=7,rmObjects_large=30000,Use_watershed=TRUE)
+
+seg<-paintObjects(GFP_mask$mask_cyto,paintObjects(GFP_mask$mask_nuc,toRGB(frame$CH1*5),opac=c(1,1),col=c("red",NA)),opac=c(1,1),col=c("green",NA),thick=TRUE,closed=TRUE)  
+plot(seg)
+```
+SVM model is created by picking cells which lost Parkin mitochondrial recruitment. These cells are labeled Positive. The function returns a feture_table contains 20 detures extracted from the segmented cells. 
+
+```{r}
+Features_Table<-Feature_extract(x=frame$CH1,mask_cyto=GFP_mask$mask_cyto,label_class="Postive")
+head(Features_Table$Ts.mix)
+```
+Picking phenotype exampled cells. The cells which Parkin mitochondrial translocation is abolished are labeled as postive cells for corresponding fetures marking. 
+
+```{r}
+Table_training<-Pick_cells(mask_nuc=GFP_mask$mask_nuc,x=frame$CH1,Ts.mix=Features_Table$Ts.mix,intens=5,parameters_nuc=GFP_mask$parameters_nuc,font_size=0.7,label_class="Postive",Masks_display=TRUE)
+head(Table_training$Table_class_train)
+
+```
+```{r}
+plot(Table_training$seg_class_sel)
+```
+The data created will be assigned in to SVM algorithm and the accuracy of linaer karnel versus non-liner karnel is compered. 
+All the tables shoud be save to the Table-training repository 
+```{r}
+head(table)
+```
+
+
+First we mesure acurrrecy for Linear Kerenel
+```{r}
+acc<-Model_svm(Table_class_train=table,kernel_linear=TRUE,cost=10, degree = 45)
+print(mean(acc))
+```
+non liner kernel 
+
+```{r}
+acc<-Model_svm(Table_class_train=table,kernel_linear=FALSE,cost=10, degree = 45)
+print(mean(acc))
+```
+
+Thea a PCA analysis for selecting features 
+
+```{r}
+PCA_plot<-Fetures_PCA(Table_class_train=table,cartesian_lim_x=c(-15,10),cartesian_lim_y =c(-20,20),font_size=14)
+PCA_plot
+```
+
+SVM model save and features selectopn acording to the PCA output
+
+```{r}
+model<-SVM_FeatureSel(Table_class_train=table,kernel_linear=FALSE,cost= 10, degree = 45)
+print(mean(model$ACC))
+```
+
+For deploy svm model and creat a mask first Nucls and cytosole will be segmented and than the model will be deploy
+
+
+##Deployment SVM 
+
+
+```{r}
+frame<-load_image(Image_File_name="Image_2.tif",path="/Users/kanferg/Desktop/Gil_LabWork/Gil_packages/AIPS_Package/Example_images/sgPINKvsWT/",minmax_nrom=TRUE)
+nuc_mask<-Nucleus_segmentation(x=frame$CH2,intens=1,filter_size=10,offset=0.04,opensize=3,
+                               rmObjects_small=30,Use_watershed=TRUE,distmap_value=2,rm_outliers=TRUE,Out_P=0.95,
+                               Masks_display=TRUE)
+GFP_mask<-Cytosol_segmentation(x=frame$CH1,y=nuc_mask$mask_nuc,intens=5,filter_size=10,offset=0.1,mat_size_smooth=19,opensize=7,rmObjects_large=30000,Use_watershed=TRUE)
+seg<-paintObjects(GFP_mask$mask_cyto,paintObjects(GFP_mask$mask_nuc,toRGB(frame$CH1*5),opac=c(1,1),col=c("red",NA)),opac=c(1,1),col=c("green",NA),thick=TRUE,closed=TRUE)  
+plot(seg)
+Features_Table<-Feature_extract(x=frame$CH1,mask_cyto=GFP_mask$mask_cyto,label_class="Postive")
+```
+
+Now the model and the features selection will be used for the deploy and the genration of called cell mask
+
+```{r}
+Target_mask<-maskGen_deploySVM(x=GFP_mask$mask_cyto,y=GFP_mask$mask_nuc,model=model$model,Table_class_train=Features_Table$Ts.mix,label_class="Postive",erode_mask=T,opensize=9,Sel=TRUE,Selected_Features=model$Selected_Features,TH=0)
+display(frame$CH1,"raster")
+celltext<-text(x= data.frame(Target_mask$table)["m.cx"][,1], y= data.frame(Target_mask$table)["m.cy"][,1], labels=data.frame(Target_mask$decision_values)[,1], col="yellow", cex = 0.8)
+
+```
+
+The selected cells which will get photoactivated
+
+```{r}
+disp_call<-paintObjects(Target_mask$mask,toRGB(frame$CH1*2),opac=c(1,1),col=c("red",NA),thick=TRUE,closed=TRUE)  
+plot(disp_call)
+```
+
+
+
+
+```{r}
+
+```
+
