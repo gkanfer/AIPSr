@@ -1,8 +1,14 @@
 Package: AIPSr
 Title: AI-photoswitchable screening (AI-PS)
 Version: 0.0.0.9000
-Authors: Gil Kanfer and Heather Buldwin
+Authors@R: 
+    person(given = "Gil",
+           family = "Kanfer",
+           role = c("aut", "cre"),
+           email = "Gil.Kanfer.il@gmail.com",
+           comment = c(ORCID = "0000-0002-9080-228X"))
 Description: This project permits the development and utilization of a pooled optical screen by making use of photoactivation and sorting. AI-PS algorithms provide a structure for segmenting cells, training machine learning algorithms to categorize cellular phenotypes, and applying these for executing a screen on the fly. To learn more, take a look at Kanfer et al., 2021.
+Imports: EBImage, e1071, data.table, plyr, dplyr, gtools, yaImpute, outliers, ggplot2, ggbiplot, progress, parallel, tibble, tidyr 
 License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
